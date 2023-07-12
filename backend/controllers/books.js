@@ -1,5 +1,7 @@
+const { ObjectID } = require('bson');
 const Book = require('../models/Book');
 const fs = require('fs');
+const { isValidObjectId } = require('mongoose');
 
 exports.createBook = (req, res, next) => {
     const bookObject = JSON.parse(req.body.book);
@@ -9,7 +11,7 @@ exports.createBook = (req, res, next) => {
         ...bookObject,
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-        averageRating: bookObject.ratings[0].rating
+        averageRating: bookObject.ratings[0].grade
     });
   
     book.save()
@@ -73,12 +75,18 @@ exports.createBook = (req, res, next) => {
 exports.postBookRating = (req, res, next) => {
 
   const newRating = { ...req.body };
-  delete newRating.rating;
+  // delete newRating.rating;
 
     Book.findOne({ _id: req.params.id })
   .then(book => {
     const savBook ={...book._doc};
-    savBook.rating = [{ ...newRating}, ...Book.rating];
+
+    const newGrade = {
+      userId: req.body.userId,
+      grade: req.body.rating
+    }
+
+    savBook.ratings = [{ ...newGrade}, ...savBook.ratings];
 
     function calcAverageRating(arr) {
         let avr = Math.round((arr.reduce((acc, elem) => acc + elem.grade, 0) / arr.length) * 100) / 100;
@@ -98,6 +106,7 @@ exports.postBookRating = (req, res, next) => {
         });
     })
     .catch((error) => {
+      console.log(error)
       res.status(400).json({ error });
     });
 };
