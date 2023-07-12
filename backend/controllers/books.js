@@ -72,34 +72,34 @@ exports.createBook = (req, res, next) => {
 
 exports.postBookRating = (req, res, next) => {
 
-    const newRating = { ...req.body };
+  const newRating = { ...req.body };
   delete newRating.rating;
 
     Book.findOne({ _id: req.params.id })
   .then(book => {
-const savBook ={...book._doc};
-savBook.rating = [{ ...newRating}, ...Book.rating];
+    const savBook ={...book._doc};
+    savBook.rating = [{ ...newRating}, ...Book.rating];
 
-function calcAverageRating(arr) {
-    let avr = Math.round((arr.reduce((acc, elem) => acc + elem.grade, 0) / arr.length) * 100) / 100;
-    return avr;
-  };
-  savBook.averageRating = calcAverageRating(savBook.ratings);
+    function calcAverageRating(arr) {
+        let avr = Math.round((arr.reduce((acc, elem) => acc + elem.grade, 0) / arr.length) * 100) / 100;
+        return avr;
+      };
+      savBook.averageRating = calcAverageRating(savBook.ratings);
 
-  Book.updateOne(
-    { _id: req.params.id },
-    {...savBook}
-    )
-    .then(() => {
-      res.status(200).json(savBook);
+      Book.updateOne(
+        { _id: req.params.id },
+        {...savBook}
+        )
+        .then(() => {
+          res.status(200).json(savBook);
+        })
+        .catch((error) => {
+          res.status(401).json({ error });
+        });
     })
     .catch((error) => {
-      res.status(401).json({ error });
+      res.status(400).json({ error });
     });
-})
-.catch((error) => {
-  res.status(400).json({ error });
-});
 };
 
 exports.getBestBooks = (req, res, next) => {
@@ -107,9 +107,9 @@ exports.getBestBooks = (req, res, next) => {
       .then((books) => {
         res
           .status(200)
-          // Pour récupérer les meilleures livres, je copie mon tableau de datas;
-          // je les classe de façon décroissante avec sort, et splice me permet de
-          //récupérer les 3 premiers livres.
+          // copie de mon tableau datas;
+          // classement en décroissante avec sort
+          //splice récupérer les 3 premiers livres.
           .json(
             [...books]
               .sort((a, b) => b.averageRating - a.averageRating)
