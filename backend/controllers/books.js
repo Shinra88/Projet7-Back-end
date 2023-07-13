@@ -1,7 +1,5 @@
-const { ObjectID } = require('bson');
 const Book = require('../models/Book');
 const fs = require('fs');
-const { isValidObjectId } = require('mongoose');
 
 exports.createBook = (req, res, next) => {
     const bookObject = JSON.parse(req.body.book);
@@ -75,24 +73,26 @@ exports.createBook = (req, res, next) => {
 exports.postBookRating = (req, res, next) => {
 
   const newRating = { ...req.body };
-  // delete newRating.rating;
+  newRating.grade = newRating.rating;
+  delete newRating.rating;
+  //ajout de la valeur grade, car les datas envoyées par le front ne sont pas celles attendues
+  // (rating au lieu de grade)
+  // userId: , rating:  à la place de userId: , grade
 
-    Book.findOne({ _id: req.params.id })
-  .then(book => {
-    const savBook ={...book._doc};
+  Book.findOne({ _id: req.params.id })
+    .then((book) => {
+      const savBook = {...book._doc};
+      savBook.ratings = [{...newRating}, ...book.ratings];
 
-    const newGrade = {
-      userId: req.body.userId,
-      grade: req.body.rating
-    }
 
-    savBook.ratings = [{ ...newGrade}, ...savBook.ratings];
-
-    function calcAverageRating(arr) {
+      //La fonction avr est égale au nouveau averageRating)
+      // On prend la some avec reduce qui accumule les elem.grade et le divise par leur length
+      // et Math.round * 100 / 100 permet d'arrondir le résultat à 2 chiffres après la virgule
+      function calcAverageGrade(arr) {
         let avr = Math.round((arr.reduce((acc, elem) => acc + elem.grade, 0) / arr.length) * 100) / 100;
         return avr;
       };
-      savBook.averageRating = calcAverageRating(savBook.ratings);
+      savBook.averageRating = calcAverageGrade(savBook.ratings);
 
       Book.updateOne(
         { _id: req.params.id },
@@ -101,12 +101,11 @@ exports.postBookRating = (req, res, next) => {
         .then(() => {
           res.status(200).json(savBook);
         })
-        .catch((error) => {
-          res.status(401).json({ error });
+        .catch((err) => {
+          res.status(401).json({err});
         });
     })
     .catch((error) => {
-      console.log(error)
       res.status(400).json({ error });
     });
 };
