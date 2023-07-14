@@ -14,8 +14,6 @@ mongoose.connect('mongodb+srv://shinra88:Chokobo88@cluster0.r7gacpk.mongodb.net/
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 app.use(express.json());
-
-
 app.use(cors());
 
 app.use((req, res, next) => {
