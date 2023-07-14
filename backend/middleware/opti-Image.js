@@ -1,5 +1,5 @@
-const sharp = require('sharp');
-const fs = require('fs');
+const sharp = require("sharp");
+const fs = require("fs");
 
 // Compression des images
 const optiImage = (req, res, next) => {
@@ -23,7 +23,7 @@ const optiImage = (req, res, next) => {
     .webp()
     .toFile(compressedImagePath, (error) => {
       if (error) {
-        return res.status(500).json({ error: 'Error during image compression' });
+        return res.status(500).json({ error: "Erreur pendant la compression de l'images" });
       }
 
       // Maj de l'image, nouveau chemin et nom

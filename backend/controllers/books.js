@@ -1,5 +1,5 @@
-const Book = require('../models/Book');
-const fs = require('fs');
+const Book = require("../models/Book");
+const fs = require("fs");
 
 exports.createBook = (req, res, next) => {
     const bookObject = JSON.parse(req.body.book);
@@ -8,29 +8,29 @@ exports.createBook = (req, res, next) => {
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
         averageRating: bookObject.ratings[0].grade
     });
   
     book.save()
-    .then(() => { res.status(201).json({message: 'Objet enregistré !'})})
+    .then(() => { res.status(201).json({message: "Objet enregistré !"})})
     .catch(error => { res.status(400).json( { error })})
  };
 
  exports.modifyBook = (req, res, next) => {
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
     } : { ...req.body };
   
     delete bookObject._userId;
     Book.findOne({_id: req.params.id})
         .then((book) => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({ message : 'Not authorized'});
+                res.status(401).json({ message : "Non autorisé"});
             } else {
                 Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-                .then(() => res.status(200).json({message : 'Objet modifié!'}))
+                .then(() => res.status(200).json({message : "Objet modifié!"}))
                 .catch(error => res.status(401).json({ error }));
             }
         })
@@ -43,12 +43,12 @@ exports.createBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id})
         .then(book => {
             if (book.userId != req.auth.userId) {
-                res.status(401).json({message: 'Not authorized'});
+                res.status(401).json({message: "Not authorized"});
             } else {
-                const filename = book.imageUrl.split('/images/')[1];
+                const filename = book.imageUrl.split("/images/")[1];
                 fs.unlink(`images/${filename}`, () => {
                     Book.deleteOne({_id: req.params.id})
-                        .then(() => { res.status(200).json({message: 'Objet supprimé !'})})
+                        .then(() => { res.status(200).json({message: "Objet supprimé !"})})
                         .catch(error => res.status(401).json({ error }));
                 });
             }
@@ -87,7 +87,7 @@ exports.postBookRating = (req, res, next) => {
 
       //La fonction avr est égale au nouveau averageRating)
       // On prend la some avec reduce qui accumule les elem.grade et le divise par leur length
-      // et Math.round * 100 / 100 permet d'arrondir le résultat à 2 chiffres après la virgule
+      // et Math.round * 100 / 100 permet d"arrondir le résultat à 2 chiffres après la virgule
       function calcAverageGrade(arr) {
         let avr = Math.round((arr.reduce((acc, elem) => acc + elem.grade, 0) / arr.length) * 100) / 100;
         return avr;
