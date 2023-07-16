@@ -17,27 +17,36 @@ exports.createBook = (req, res, next) => {
     .catch(error => { res.status(400).json( { error })})
  };
 
- exports.modifyBook = (req, res, next) => {
+ exports.modifyBook = async (req, res, next) => {
+  
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
-    } : { ...req.body };
-  
+    } : { ...req.body }
+
     delete bookObject._userId;
     Book.findOne({_id: req.params.id})
-        .then((book) => {
-            if (book.userId != req.auth.userId) {
-                res.status(401).json({ message : "Non autorisé"});
-            } else {
-                Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-                .then(() => res.status(200).json({message : "Objet modifié!"}))
-                .catch(error => res.status(401).json({ error }));
-            }
-        })
-        .catch((error) => {
-            res.status(400).json({ error });
-        });
- };
+    .then((book) => {
+      if (book === null) {
+        return res.status(404).json({ error: "Ce livre n'existe pas !" });
+      } else if (book.userId != req.auth.userId) {
+        return res.status(403).json({ message: "Demande non autorisée" });
+      } else if (req.file) {
+        //si nouvelle image supression de l'ancienne
+        const filename = book.imageUrl.split("/images")[1];
+        fs.unlink(`images/${filename}`, () => {});
+      }
+      Book.updateOne(
+        { _id: req.params.id },
+        { ...bookObject, _id: req.params.id }
+      )
+        .then(() => res.status(200).json({ message: "Livre modifié!" }))
+        .catch((error) => res.status(500).json({ error }));
+    })
+    .catch((error) => {
+      res.status(500).json({ error });
+    });
+};
 
  exports.deleteBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id})

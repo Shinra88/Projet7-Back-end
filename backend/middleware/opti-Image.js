@@ -6,10 +6,9 @@ const optiImage = (req, res, next) => {
   if (!req.file) {
     return next();
   }
-
+  
   // Chemin du fichier d'origine
   const imagePath = req.file.path;
-
   // changement de nom du fichier
   const fileName = req.file.filename.split('.')[0];
   const compressedFileName = `${fileName}${Date.now()}.webp`;
@@ -24,7 +23,7 @@ const optiImage = (req, res, next) => {
     .toFile(compressedImagePath, (error) => {
       if (error) {
         return res.status(500).json({ error: "Erreur pendant la compression de l'images" });
-      }
+      };
 
       // Maj de l'image, nouveau chemin et nom
       req.file.filename = compressedFileName;
@@ -32,7 +31,7 @@ const optiImage = (req, res, next) => {
 
       // Suppression de l'ancien fichier
       fs.unlinkSync(imagePath);
-
+      
       next();
     });
 };
