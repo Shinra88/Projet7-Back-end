@@ -18,7 +18,8 @@ const optiImage = (req, res, next) => {
 
   // Compression de l'image
   sharp(imagePath)
-    .resize({ height: 568 })
+    .resize(352, 568, {
+      fit: 'fill'})
     .webp()
     .toFile(compressedImagePath, (error) => {
       if (error) {

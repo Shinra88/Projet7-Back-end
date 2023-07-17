@@ -95,7 +95,7 @@ exports.postBookRating = (req, res, next) => {
 
 
       //La fonction avr est égale au nouveau averageRating)
-      // On prend la some avec reduce qui accumule les elem.grade et le divise par leur length
+      // On prend la some avec reduce qui accumule les elem.grade et le divise par leur longeur avec length
       // et Math.round * 100 / 100 permet d"arrondir le résultat à 2 chiffres après la virgule
       function calcAverageGrade(arr) {
         let avr = Math.round((arr.reduce((acc, elem) => acc + elem.grade, 0) / arr.length) * 100) / 100;
