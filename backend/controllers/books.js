@@ -17,7 +17,7 @@ exports.createBook = (req, res, next) => {
     .catch(error => { res.status(400).json( { error })})
  };
 
- exports.modifyBook = async (req, res, next) => {
+ exports.modifyBook = (req, res, next) => {
   
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
@@ -34,7 +34,8 @@ exports.createBook = (req, res, next) => {
       } else if (req.file) {
         //si nouvelle image supression de l'ancienne
         const filename = book.imageUrl.split("/images")[1];
-        fs.unlink(`images/${filename}`, () => {});
+        fs.promises.unlink(`images/${filename}`)
+          .catch((error) => res.status(500).json({ error }));
       }
       Book.updateOne(
         { _id: req.params.id },
