@@ -1,4 +1,4 @@
-const API_URL = 'https://projet7-back-end-only.vercel.app/';
+const API_URL = 'https://voluble-treacle-060749.netlify.app/';
 export const API_ROUTES = {
   SIGN_UP: `${API_URL}/api/auth/signup`,
   SIGN_IN: `${API_URL}/api/auth/login`,
