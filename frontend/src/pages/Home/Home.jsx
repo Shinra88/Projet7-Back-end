@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import BookItem from '../../components/Books/BookItem/BookItem';
-import Banner from '../../images/home_banner.jpg';
+import BestRateBooks from '../../components/Books/BestRatedBooks/BestRatedBooks';
+import Banner from '../../images/library.png';
 import styles from './Home.module.css';
 import { getBooks } from '../../lib/common';
 
@@ -27,15 +29,22 @@ function Home() {
       <div className={styles.banner} style={backgroundImageStyle} />
       <main className={styles.main}>
         <header className={styles.head}>
-          <h1>Nos Livres</h1>
-          <p>à lire et à relire</p>
-          <Link to="/Ajouter" className="button">+ Ajouter un livre</Link>
+          <p>
+            <NavLink to="/Ajouter" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
+              Dernier ajout
+            </NavLink>
+          </p>
+          <p>
+            <NavLink to="/Ajouter" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
+              Mieux noté
+            </NavLink>
+          </p>
         </header>
+        <BestRateBooks />
         <section className={styles.bookList}>
           {loading ? <h1>Chargement</h1> : displayBooks()}
         </section>
       </main>
-
     </div>
 
   );

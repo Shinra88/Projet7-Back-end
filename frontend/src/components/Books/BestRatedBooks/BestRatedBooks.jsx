@@ -11,8 +11,7 @@ function BestRatedBooks() {
   ) : <h3>Aucune recommendation</h3>;
 
   return (
-    <section className={`content-container ${styles.BestRatedBooks}`}>
-      <h2>Les mieux notés</h2>
+    <section className={styles.BestRatedBooks}>
       <div className={styles.List}>
         {bestRatedBooksContent}
       </div>
