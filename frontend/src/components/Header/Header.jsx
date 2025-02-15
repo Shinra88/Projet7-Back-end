@@ -1,25 +1,53 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import * as PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import styles from './Header.module.css';
 import Logo from '../../images/Logo.png';
 import FeatherIcon from '../../images/feather.png';
+import DropdownMenu from '../DropdownMenu/DropdownMenu';
+import DropdownYear from '../DropdownYear/DropdownYear';
+import AddBookModal from '../../Modals/AddBook/AddBook';
+import LoginModal from '../../Modals/Login/Login';
+import RegisterModal from '../../Modals/SignIn/SignIn';
+import ForgetModal from '../../Modals/Forget/Forget';
 
-function Header({ user, setUser }) {
-  const navigate = useNavigate();
-  const disconnect = () => {
-    localStorage.clear();
-    setUser(null);
-    navigate('/');
+function Header({ updateCategories, updateYear }) {
+  const [showAddBook, setShowAddBook] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showForgetPassword, setShowForgetPassword] = useState(false);
+
+  const categories = [
+    'Amour',
+    'Aventure',
+    'Fantastique',
+    'Fantasy',
+    'Historique',
+    'Policier',
+    'Science-Fiction',
+  ];
+
+  // Fonction pour fermer toutes les modals
+  const closeAllModals = () => {
+    setShowLogin(false);
+    setShowRegister(false);
+    setShowForgetPassword(false);
+    setShowAddBook(false);
+  };
+
+  // Fonction pour ouvrir Login depuis SignIn
+  const openLogin = () => {
+    closeAllModals();
+    setShowLogin(true);
   };
 
   return (
     <header className={styles.Header}>
       <div className={styles.container}>
         <img className={styles.logo} src={Logo} alt="logo WonderBook" />
-        <div className={styles.navBar}>
+        <nav className={styles.navBar}>
           <ul>
             <li>
               <NavLink to="/" end className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
@@ -27,42 +55,52 @@ function Header({ user, setUser }) {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/Ajouter" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
-                Catégories
-              </NavLink>
+              <DropdownMenu categories={categories} onFilterChange={updateCategories} />
             </li>
             <li>
-              <NavLink to="/Ajouter" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
-                Années
-              </NavLink>
+              <DropdownYear onFilterChange={updateYear} />
             </li>
             <li>
-              <NavLink to="/Ajouter" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
+              <NavLink to="/Forum" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
                 Forum
               </NavLink>
             </li>
             <li>
-              <NavLink to="/Ajouter" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
+              <NavLink to="/Collection" className={({ isActive }) => (isActive ? styles.activeLink : undefined)}>
                 Ma collection
               </NavLink>
             </li>
             <li>
-              {/* <Link to="/Ajouter" className="button">+ Ajouter un livre</Link> */}
-              <button type="button" onClick={!user ? () => navigate('/Connexion') : disconnect} onKeyUp={!user ? () => navigate('/Connexion') : disconnect} className={styles.activeLink} aria-label={!user ? 'Se connecter' : 'Se déconnecter'}>
-                {!user ? 'Ajouter un livre' : 'Se déconnecter'}
+              <button
+                type="button"
+                className={styles.Button}
+                aria-label="Ajouter un livre"
+                onClick={() => setShowAddBook(true)}
+              >
+                Ajouter un livre
                 <img src={FeatherIcon} alt="Feather Icon" className={styles.icon} />
               </button>
             </li>
           </ul>
-        </div>
+        </nav>
         <div className={styles.content}>
-          <div className={styles.Button}>
-            <button type="button" onClick={!user ? () => navigate('/Connexion') : disconnect} onKeyUp={!user ? () => navigate('/Connexion') : disconnect} className={styles.activeLink} aria-label={!user ? 'Se connecter' : 'Se déconnecter'}>
-              {!user ? 'Se connecter' : 'Se déconnecter'}
+          <div>
+            <button
+              type="button"
+              className={styles.Button}
+              aria-label="Se connecter"
+              onClick={() => setShowLogin(true)}
+            >
+              Se connecter
               <img src={FeatherIcon} alt="Feather Icon" className={styles.icon} />
             </button>
-            <button type="button" onClick={!user ? () => navigate('/Connexion') : disconnect} onKeyUp={!user ? () => navigate('/Connexion') : disconnect} className={styles.activeLink} aria-label={!user ? 'Se connecter' : 'Se déconnecter'}>
-              {!user ? 'Inscription' : 'Se déconnecter'}
+            <button
+              type="button"
+              className={styles.Button}
+              aria-label="Inscription"
+              onClick={() => setShowRegister(true)}
+            >
+              Inscription
               <img src={FeatherIcon} alt="Feather Icon" className={styles.icon} />
             </button>
           </div>
@@ -76,20 +114,31 @@ function Header({ user, setUser }) {
           </div>
         </div>
       </div>
+
+      {/* Affichage des modals en fonction des états */}
+      {showAddBook && <AddBookModal onClose={() => setShowAddBook(false)} />}
+      {showLogin && (
+        <LoginModal
+          onClose={closeAllModals}
+          openRegister={() => {
+            closeAllModals();
+            setShowRegister(true);
+          }}
+          openForgetPassword={() => {
+            closeAllModals();
+            setShowForgetPassword(true);
+          }}
+        />
+      )}
+      {showRegister && <RegisterModal onClose={closeAllModals} openLogin={openLogin} />}
+      {showForgetPassword && <ForgetModal onClose={closeAllModals} />}
     </header>
   );
 }
 
 Header.propTypes = {
-  user: PropTypes.shape({
-    userId: PropTypes.string,
-    token: PropTypes.string,
-  }),
-  setUser: PropTypes.func.isRequired,
-};
-
-Header.defaultProps = {
-  user: null,
+  updateCategories: PropTypes.func.isRequired,
+  updateYear: PropTypes.func.isRequired,
 };
 
 export default Header;

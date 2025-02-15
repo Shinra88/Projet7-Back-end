@@ -9,7 +9,6 @@
     position: relative;
 }
 
-
 .banner {
     position: fixed;
     top: 0;
@@ -38,13 +37,82 @@
     flex-direction: column;
 }
 
-.head {
-display: flex;
-align-items: center;
-justify-content: space-around;
-padding-inline: 35%;
+/* --------- MENU (ONGLETS) --------- */
+.menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    border-bottom: 2px solid #ccc;
+    padding-top: 15px;
 }
 
+.menu button {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding-top: 10px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    color: #444;
+    outline: none;
+}
+
+/* Style du bouton sélectionné (même background que l'aside) */
+.menu .active {
+    font-weight: bold;
+    background-color: #e8d8a0;
+    padding: 10px 25px;
+    border-radius: 8px 8px 0px 0px;
+    outline: 2px solid #e8d8a0;
+}
+
+/* Ajout d'une ligne sous l'élément actif */
+.menu .active::after {
+    content: '';
+    display: block;
+    height: 3px;
+    width: 100%;
+}
+
+/* Style du bouton inactif */
+.menu .inactive {
+    color: #888;
+    opacity: 0.7;
+}
+
+/* Ajout d'un effet au survol */
+.menu button:hover {
+    opacity: 1;
+    color: #222;
+}
+
+/* --------- ASIDE (MIEUX NOTÉ) --------- */
+.offer {
+    background-color: #e8d8a0; /* Même couleur que le bouton actif */
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.filters_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+
+/* --------- LISTE DES LIVRES --------- */
 .bookList {
     display: flex;
     flex-wrap: wrap;

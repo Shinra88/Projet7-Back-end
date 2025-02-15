@@ -92,21 +92,3 @@ h1 {
   font-style: italic;
   color: #796157;
 }
-
-button, .button {
-  color: #2C1810;
-  background-color: #D9A963;
-  text-decoration: none;
-  padding: 20px;
-  border-radius: 5px;
-  border: none;
-  font-size: 16px;
-  transition: 0.5s;
-}
-
-button:hover, .button:hover {
-  text-decoration: none;
-  background-color: #B99056;
-  color: #fff;
-  transition: 0.5s;
-}
