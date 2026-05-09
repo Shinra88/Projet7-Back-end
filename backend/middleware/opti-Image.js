@@ -1,5 +1,6 @@
 const sharp = require("sharp");
 const fs = require("fs");
+const path = require("path");
 
 // Compression des images
 const optiImage = (req, res, next) => {
@@ -8,13 +9,24 @@ const optiImage = (req, res, next) => {
   }
   
   // Chemin du fichier d'origine
-  const imagePath = req.file.path;
+  const uploadRoot = path.resolve(req.file.destination);
+  const imagePath = path.resolve(uploadRoot, req.file.path);
   // changement de nom du fichier
   const fileName = req.file.filename.split('.')[0];
   const compressedFileName = `${fileName}${Date.now()}.webp`;
 
   // Nouveau chemin pour l'image compressée
-  const compressedImagePath = `${req.file.destination}/${compressedFileName}`;
+  const compressedImagePath = path.resolve(uploadRoot, compressedFileName);
+  const imagePathRelative = path.relative(uploadRoot, imagePath);
+  const compressedPathRelative = path.relative(uploadRoot, compressedImagePath);
+  if (
+    imagePathRelative.startsWith("..") ||
+    path.isAbsolute(imagePathRelative) ||
+    compressedPathRelative.startsWith("..") ||
+    path.isAbsolute(compressedPathRelative)
+  ) {
+    return res.status(400).json({ error: "Chemin de fichier invalide" });
+  }
 
   // Compression de l'image
   sharp(imagePath)
