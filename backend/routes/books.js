@@ -11,12 +11,17 @@ const ratingLimiter = rateLimit({
   max: 30, // limit each IP to 30 rating requests per window
 });
 
+const deleteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // limit each IP to 20 delete requests per window
+});
+
 router.get("/", booksCtrl.getAllBook);
 router.post("/", auth, multer, optiImage, booksCtrl.createBook);
 router.get("/bestrating", booksCtrl.getBestBooks);
 router.get("/:id", booksCtrl.getOneBook);
 router.put("/:id", auth, multer, optiImage, booksCtrl.modifyBook);
-router.delete("/:id", auth, booksCtrl.deleteBook);
+router.delete("/:id", deleteLimiter, auth, booksCtrl.deleteBook);
 router.post("/:id/rating", ratingLimiter, auth, booksCtrl.postBookRating);
 
 
